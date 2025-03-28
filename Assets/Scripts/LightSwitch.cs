@@ -17,19 +17,19 @@ public class LightSwitch : MonoBehaviour
     public float lightsOffTooLongTime = 10f;
 
     private bool playerInRange = false;
-    private CampingSwitch campingSwitch;
-    private JumpScares jumpScares;
-    private EndGame endGame; 
+    public CampingSwitch campingSwitch;
+    public JumpScares jumpScares;
+    public EndGame endGame; 
 
     private void Start()
     {
         RenderSettings.fog = true;
         lightOn.SetActive(false);
-        ambience.Stop();
 
-        campingSwitch = FindObjectOfType<CampingSwitch>();
-        jumpScares = FindObjectOfType<JumpScares>();
-        endGame = FindObjectOfType<EndGame>(); 
+        // Ensure all references are assigned in the Inspector
+        if (campingSwitch == null) Debug.LogError("CampingSwitch is not assigned in LightSwitch!");
+        if (jumpScares == null) Debug.LogError("JumpScares is not assigned in LightSwitch!");
+        if (endGame == null) Debug.LogError("EndGame is not assigned in LightSwitch!");
     }
 
     private void Update()

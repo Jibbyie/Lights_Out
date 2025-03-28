@@ -5,11 +5,14 @@ using TMPro;
 public class CampingSwitch : MonoBehaviour
 {
     public TMP_Text backAwayText;
+    public TMP_Text backAwayText2;
     public float timeNearSwitch = 0f;
-    private bool isShowingText = false;
+    private bool isShowingBackAwayText = false;
+    private bool isShowingBackAwayText2 = false;
     private bool playerCamping = false; 
 
-    public float campingTimeThreshold1 = 5f; 
+    public float campingTimeThreshold1 = 5f;
+    public float campingTimeThreshold2 = 15f;
     public float maxCampingTime = 30f; 
 
     private void Update()
@@ -18,9 +21,14 @@ public class CampingSwitch : MonoBehaviour
         {
             timeNearSwitch += Time.deltaTime;
 
-            if (timeNearSwitch >= campingTimeThreshold1 && !isShowingText)
+            if (timeNearSwitch >= campingTimeThreshold1 && !isShowingBackAwayText)
             {
                 StartCoroutine(ShowBackAwayText());
+            }
+
+            if(timeNearSwitch >= campingTimeThreshold2 && !isShowingBackAwayText2)
+            {
+                StartCoroutine(ShowBackAwayText2());
             }
 
             if (timeNearSwitch >= maxCampingTime)
@@ -42,10 +50,10 @@ public class CampingSwitch : MonoBehaviour
 
     IEnumerator ShowBackAwayText()
     {
-        isShowingText = true;
+        isShowingBackAwayText = true;
 
         float flickerDuration = 2f;
-        float flickerInterval = 0.05f;
+        float flickerInterval = 0.08f;
         float elapsedTime = 0f;
 
         while (elapsedTime < flickerDuration)
@@ -56,7 +64,24 @@ public class CampingSwitch : MonoBehaviour
         }
 
         backAwayText.gameObject.SetActive(false);
-        isShowingText = false;
+    }
+
+    IEnumerator ShowBackAwayText2()
+    {
+        isShowingBackAwayText2 = true;
+
+        float flickerDuration = 2f;
+        float flickerInterval = 0.05f;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < flickerDuration)
+        {
+            backAwayText2.gameObject.SetActive(!backAwayText2.gameObject.activeSelf);
+            yield return new WaitForSeconds(flickerInterval);
+            elapsedTime += flickerInterval;
+        }
+
+        backAwayText2.gameObject.SetActive(false);
     }
 
     private void TriggerCampingPunishment()
