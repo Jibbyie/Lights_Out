@@ -6,13 +6,24 @@ public class LightSwitch : MonoBehaviour
 {
     public GameObject intIcon, lightOn;
     public bool lightIsOn = false;
-    public AudioSource switchSound;
+    public AudioSource switchTurnOn;
+    public AudioSource switchTurnOff;
+    private Coroutine lightOffTimer;
 
     private bool playerInRange = false; // Tracks if player is near the switch
 
     public void Start()
     {
         RenderSettings.fog = true;
+        lightOn.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        {
+            TurnOnLights();
+        }
     }
 
     private void OnTriggerStay(Collider other)
@@ -33,14 +44,27 @@ public class LightSwitch : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void TurnOnLights()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
-        {
-            lightIsOn = true;
-            RenderSettings.fog = false;
-            lightOn.SetActive(true);
-            switchSound.Play();
-        }
+        lightIsOn = true;
+        RenderSettings.fog = false;
+        lightOn.SetActive(true);
+        switchTurnOn.Play();
+
+        // Start a new random countdown to turn lights off
+        if (lightOffTimer != null) StopCoroutine(lightOffTimer);
+        lightOffTimer = StartCoroutine(LightOffCountdown());
     }
+
+    IEnumerator LightOffCountdown()
+    {
+        float waitTime = Random.Range(5f, 15f);
+        yield return new WaitForSeconds(waitTime);
+
+        lightIsOn = false;
+        RenderSettings.fog = true;
+        lightOn.SetActive(false);
+        switchTurnOff.Play();
+    }
+
 }
