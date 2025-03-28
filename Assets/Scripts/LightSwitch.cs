@@ -11,7 +11,17 @@ public class LightSwitch : MonoBehaviour
     public AudioSource switchTurnOff;
     public AudioSource ambience;
 
+    public AudioSource jumpScareSFX;
+
     private Coroutine lightOffTimer;
+    public float lightsTurnedOffCounter = 0f;
+    public float lightsTurnedOffTime = 0f;
+    public float endGameTimer = 0f;
+    public float timeNearSwitch = 0f;
+
+    public float endGameTime = 180f;
+    public float campingLightsTime = 30f;
+    public float lightsOffTooLongTime = 10f;
 
     private bool playerInRange = false; // Tracks if player is near the switch
 
@@ -28,6 +38,14 @@ public class LightSwitch : MonoBehaviour
         {
             TurnOnLights();
         }
+
+        endGameTimer += Time.deltaTime;
+        if (endGameTimer >= endGameTime)
+        {
+            JumpScare();
+        }
+
+        TriggerJEarlyumpScare();
     }
 
     private void OnTriggerStay(Collider other)
@@ -36,6 +54,7 @@ public class LightSwitch : MonoBehaviour
         {
             intIcon.SetActive(true);
             playerInRange = true; // Player is near the switch
+            timeNearSwitch += Time.deltaTime;
         }
     }
 
@@ -53,8 +72,11 @@ public class LightSwitch : MonoBehaviour
         lightIsOn = true;
         RenderSettings.fog = false;
         lightOn.SetActive(true);
-        switchTurnOn.Play();
-        ambience.Play();
+        if (!switchTurnOn.isPlaying && !ambience.isPlaying)
+        {
+            switchTurnOn.Play();
+            ambience.Play();
+        }
 
         // Start a new random countdown to turn lights off
         if (lightOffTimer != null) StopCoroutine(lightOffTimer);
@@ -71,6 +93,36 @@ public class LightSwitch : MonoBehaviour
         lightOn.SetActive(false);
         switchTurnOff.Play();
         ambience.Stop();
+        lightsTurnedOffCounter += 1;
     }
 
+    private void TimeNearSwitch()
+    {
+        if(timeNearSwitch >= 5f)
+        {
+
+        }
+    }
+
+    private void TriggerJEarlyumpScare()
+    {
+        if(lightIsOn == false)
+        {
+            lightsTurnedOffTime += Time.deltaTime;
+            if(lightsTurnedOffTime >= lightsOffTooLongTime)
+            {
+                JumpScare();
+            }
+        }
+        if(lightIsOn == true)
+        {
+            lightsTurnedOffTime = 0f;
+        }
+    }
+
+    private void JumpScare()
+    {
+        jumpScareSFX.Play();
+        Debug.Log("Boo!");
+    }
 }
