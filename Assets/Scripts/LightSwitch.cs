@@ -6,8 +6,11 @@ public class LightSwitch : MonoBehaviour
 {
     public GameObject intIcon, lightOn;
     public bool lightIsOn = false;
+
     public AudioSource switchTurnOn;
     public AudioSource switchTurnOff;
+    public AudioSource ambience;
+
     private Coroutine lightOffTimer;
 
     private bool playerInRange = false; // Tracks if player is near the switch
@@ -16,6 +19,7 @@ public class LightSwitch : MonoBehaviour
     {
         RenderSettings.fog = true;
         lightOn.SetActive(false);
+        ambience.Stop();
     }
 
     private void Update()
@@ -50,6 +54,7 @@ public class LightSwitch : MonoBehaviour
         RenderSettings.fog = false;
         lightOn.SetActive(true);
         switchTurnOn.Play();
+        ambience.Play();
 
         // Start a new random countdown to turn lights off
         if (lightOffTimer != null) StopCoroutine(lightOffTimer);
@@ -65,6 +70,7 @@ public class LightSwitch : MonoBehaviour
         RenderSettings.fog = true;
         lightOn.SetActive(false);
         switchTurnOff.Play();
+        ambience.Stop();
     }
 
 }
