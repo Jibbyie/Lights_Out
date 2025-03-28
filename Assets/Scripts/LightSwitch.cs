@@ -1,6 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class LightSwitch : MonoBehaviour
 {
@@ -11,25 +11,25 @@ public class LightSwitch : MonoBehaviour
     public AudioSource switchTurnOff;
     public AudioSource ambience;
 
-    public AudioSource jumpScareSFX;
-
     private Coroutine lightOffTimer;
     public float lightsTurnedOffCounter = 0f;
     public float lightsTurnedOffTime = 0f;
-    public float endGameTimer = 0f;
-    public float timeNearSwitch = 0f;
-
-    public float endGameTime = 180f;
-    public float campingLightsTime = 30f;
     public float lightsOffTooLongTime = 10f;
 
-    private bool playerInRange = false; // Tracks if player is near the switch
+    private bool playerInRange = false;
+    private CampingSwitch campingSwitch;
+    private JumpScares jumpScares;
+    private EndGame endGame; 
 
-    public void Start()
+    private void Start()
     {
         RenderSettings.fog = true;
         lightOn.SetActive(false);
         ambience.Stop();
+
+        campingSwitch = FindObjectOfType<CampingSwitch>();
+        jumpScares = FindObjectOfType<JumpScares>();
+        endGame = FindObjectOfType<EndGame>(); 
     }
 
     private void Update()
@@ -39,13 +39,7 @@ public class LightSwitch : MonoBehaviour
             TurnOnLights();
         }
 
-        endGameTimer += Time.deltaTime;
-        if (endGameTimer >= endGameTime)
-        {
-            JumpScare();
-        }
-
-        TriggerJEarlyumpScare();
+        TriggerEarlyJumpScare();
     }
 
     private void OnTriggerStay(Collider other)
@@ -53,8 +47,12 @@ public class LightSwitch : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             intIcon.SetActive(true);
-            playerInRange = true; // Player is near the switch
-            timeNearSwitch += Time.deltaTime;
+            playerInRange = true;
+
+            if (campingSwitch != null)
+            {
+                campingSwitch.PlayerNearSwitch(true);
+            }
         }
     }
 
@@ -63,7 +61,12 @@ public class LightSwitch : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             intIcon.SetActive(false);
-            playerInRange = false; // Player leaves switch area
+            playerInRange = false;
+
+            if (campingSwitch != null)
+            {
+                campingSwitch.PlayerNearSwitch(false);
+            }
         }
     }
 
@@ -78,7 +81,6 @@ public class LightSwitch : MonoBehaviour
             ambience.Play();
         }
 
-        // Start a new random countdown to turn lights off
         if (lightOffTimer != null) StopCoroutine(lightOffTimer);
         lightOffTimer = StartCoroutine(LightOffCountdown());
     }
@@ -96,33 +98,22 @@ public class LightSwitch : MonoBehaviour
         lightsTurnedOffCounter += 1;
     }
 
-    private void TimeNearSwitch()
+    private void TriggerEarlyJumpScare()
     {
-        if(timeNearSwitch >= 5f)
-        {
-
-        }
-    }
-
-    private void TriggerJEarlyumpScare()
-    {
-        if(lightIsOn == false)
+        if (!lightIsOn)
         {
             lightsTurnedOffTime += Time.deltaTime;
-            if(lightsTurnedOffTime >= lightsOffTooLongTime)
+            if (lightsTurnedOffTime >= lightsOffTooLongTime)
             {
-                JumpScare();
+                if (jumpScares != null)
+                {
+                    jumpScares.TriggerJumpScare();
+                }
             }
         }
-        if(lightIsOn == true)
+        else
         {
             lightsTurnedOffTime = 0f;
         }
-    }
-
-    private void JumpScare()
-    {
-        jumpScareSFX.Play();
-        Debug.Log("Boo!");
     }
 }
