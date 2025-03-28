@@ -12,14 +12,13 @@ public class LightSwitch : MonoBehaviour
     public AudioSource ambience;
 
     private Coroutine lightOffTimer;
-    public float lightsTurnedOffCounter = 0f;
     public float lightsTurnedOffTime = 0f;
-    public float lightsOffTooLongTime = 10f;
+    public float lightsOffTooLongTime = 20f;
 
     private bool playerInRange = false;
     public CampingSwitch campingSwitch;
     public JumpScares jumpScares;
-    public EndGame endGame; 
+    public EndGame endGame;
 
     private void Start()
     {
@@ -95,8 +94,11 @@ public class LightSwitch : MonoBehaviour
         lightOn.SetActive(false);
         switchTurnOff.Play();
         ambience.Stop();
-        lightsTurnedOffCounter += 1;
+
+        // Update the global counter in SwitchManager
+        FindObjectOfType<LightSwitchManager>()?.OnLightsTurnedOff();
     }
+
 
     private void TriggerEarlyJumpScare()
     {

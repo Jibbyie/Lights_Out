@@ -1,22 +1,29 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Rounds : MonoBehaviour
 {
-    public LightSwitch lightSwitch;
-    private float lightsTurnedOffCounter;
+    private LightSwitchManager switchManager;
+    private int lightsTurnedOffCounter;
 
     void Start()
     {
-        lightSwitch = FindObjectOfType<LightSwitch>();
-        lightsTurnedOffCounter = lightSwitch.lightsTurnedOffCounter;
+        switchManager = FindObjectOfType<LightSwitchManager>();
+
+        if (switchManager != null)
+        {
+            lightsTurnedOffCounter = switchManager.GetLightsTurnedOffCount();
+        }
+        else
+        {
+            Debug.LogError("SwitchManager not found in the scene!");
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-       
+        if (switchManager != null)
+        {
+            lightsTurnedOffCounter = switchManager.GetLightsTurnedOffCount();
+        }
     }
 }
