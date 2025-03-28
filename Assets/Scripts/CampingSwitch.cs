@@ -9,7 +9,11 @@ public class CampingSwitch : MonoBehaviour
     public float timeNearSwitch = 0f;
     private bool isShowingBackAwayText = false;
     private bool isShowingBackAwayText2 = false;
-    private bool playerCamping = false; 
+    private bool playerCamping = false;
+
+    public AudioSource whisper1;
+    public AudioSource whisper2;
+    public AudioSource whisper3;
 
     public float campingTimeThreshold1 = 5f;
     public float campingTimeThreshold2 = 15f;
@@ -23,11 +27,13 @@ public class CampingSwitch : MonoBehaviour
 
             if (timeNearSwitch >= campingTimeThreshold1 && !isShowingBackAwayText)
             {
+                whisper1.Play();
                 StartCoroutine(ShowBackAwayText());
             }
 
             if(timeNearSwitch >= campingTimeThreshold2 && !isShowingBackAwayText2)
             {
+                whisper2.Play();
                 StartCoroutine(ShowBackAwayText2());
             }
 
@@ -70,7 +76,7 @@ public class CampingSwitch : MonoBehaviour
     {
         isShowingBackAwayText2 = true;
 
-        float flickerDuration = 2f;
+        float flickerDuration = 3f;
         float flickerInterval = 0.05f;
         float elapsedTime = 0f;
 
