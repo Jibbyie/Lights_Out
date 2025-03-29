@@ -8,7 +8,8 @@ public class Rounds : MonoBehaviour
     private LightSwitchManager switchManager;
     private PauseMenu pauseMenu;
     private bool onLightsTurnedOn;
-    private bool entityActive = false;
+    private bool mirror1Active = false;
+    private bool mirror2Active = false;
 
     private List<Action> actions = new List<Action>();
 
@@ -17,17 +18,23 @@ public class Rounds : MonoBehaviour
     public AudioSource doorKnockingSFX;
     public AudioSource behindYouSFX;
     public AudioSource mirrorWhispersSFX;
+    public AudioSource mirrorWhispers2SFX;
 
     [Header("Game Objects")]
-    public GameObject entity;
+    public GameObject mirror1;
+    public GameObject mirror2;
 
     private int lastEventIndex = -1;
     private int lightsTurnedOffCounter;
 
     void Start()
     {
-        entity.SetActive(true);
-        entity.SetActive(false);
+        // Mirrors preloading
+        mirror1.SetActive(true);
+        mirror1.SetActive(false);
+        mirror2.SetActive(true);
+        mirror2.SetActive(false);
+
         switchManager = FindObjectOfType<LightSwitchManager>();
         pauseMenu = FindObjectOfType<PauseMenu>();
 
@@ -61,18 +68,34 @@ public class Rounds : MonoBehaviour
 
     private void HandleLightsOn()
     {
-        if(entityActive)
+        if(mirror1Active)
         {
             mirrorWhispersSFX.Stop();
+        }
+        if(mirror2Active)
+        {
+            mirrorWhispers2SFX.Stop();
         }
     }
 
     private void HandleLightsOff()
     {
+        lightsTurnedOffCounter = switchManager.GetLightsTurnedOffCount(); // Update before checking
+
         ChooseRandomEvent();
-        if (entityActive)
+        if (mirror1Active)
         {
             mirrorWhispersSFX.Play();
+        }
+        if (lightsTurnedOffCounter >= 1)
+        {
+            mirror1.SetActive(false);
+            mirror2.SetActive(true);
+            mirror2Active = true;
+        }
+        if (mirror2Active)
+        {
+            mirrorWhispers2SFX.Play();
         }
     }
 
@@ -164,8 +187,8 @@ public class Rounds : MonoBehaviour
 
     private void MirrorSpawn()
     {
-        entity.SetActive(true);
-        entityActive = true;
+        mirror1.SetActive(true);
+        mirror1Active = true;
         mirrorWhispersSFX.Play();
         Debug.Log("Mirror spawned");
     }
