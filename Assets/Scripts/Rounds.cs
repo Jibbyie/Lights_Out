@@ -15,9 +15,7 @@ public class Rounds : MonoBehaviour
     {
         switchManager = FindObjectOfType<LightSwitchManager>();
 
-        actions.Add(EventA);
-        actions.Add(EventB);
-        actions.Add(EventC);
+        PopulateActionList();
 
         if (switchManager != null)
         {
@@ -42,8 +40,17 @@ public class Rounds : MonoBehaviour
         if (actions.Count > 0)
         {
             int randomIndex = UnityEngine.Random.Range(0, actions.Count);
-            actions[randomIndex].Invoke(); // Randomly call horror function from actions list
-            actions.RemoveAt(randomIndex); // Remove it so it doesn't happen twice
+            Action selectedEvent = actions[randomIndex];
+            selectedEvent.Invoke(); // Randomly call selected horror function from actions list
+
+            actions.RemoveAll(a => a == selectedEvent); // Remove selected function and all instances of it
+                                                        // to remove super common events
+            Debug.Log("Current Actions in List:: ");
+
+            foreach (var action in actions)
+            {
+                Debug.Log(action.Method.Name); // Print functions name
+            }
         }
         else
         {
@@ -51,6 +58,20 @@ public class Rounds : MonoBehaviour
         }
     }
 
+    void PopulateActionList()
+    {
+        // Common Events (Added multiple times)
+        actions.Add(EventA);
+        actions.Add(EventA);
+        actions.Add(EventA);
+        actions.Add(EventA); // Higher chance of being picked
+
+        actions.Add(EventB);
+        actions.Add(EventB); // Medium chance
+
+        // Rare Event (Only added once)
+        actions.Add(EventC); // Lower chance of being picked
+    }
 
     private void EventA()
     {
