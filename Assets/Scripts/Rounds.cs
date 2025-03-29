@@ -8,7 +8,7 @@ public class Rounds : MonoBehaviour
 
     private List<Action> actions = new List<Action>();
 
-    public GameObject table;
+    public AudioSource doorKnockingSFX;
     private int lightsTurnedOffCounter;
 
     void Start()
@@ -45,12 +45,6 @@ public class Rounds : MonoBehaviour
 
             actions.RemoveAll(a => a == selectedEvent); // Remove selected function and all instances of it
                                                         // to remove super common events
-            Debug.Log("Current Actions in List:: ");
-
-            foreach (var action in actions)
-            {
-                Debug.Log(action.Method.Name); // Print functions name
-            }
         }
         else
         {
@@ -61,10 +55,10 @@ public class Rounds : MonoBehaviour
     void PopulateActionList()
     {
         // Common Events (Added multiple times)
-        actions.Add(EventA);
-        actions.Add(EventA);
-        actions.Add(EventA);
-        actions.Add(EventA); // Higher chance of being picked
+        actions.Add(DoorKnocking);
+        actions.Add(DoorKnocking);
+        actions.Add(DoorKnocking);
+        actions.Add(DoorKnocking); // Higher chance of being picked
 
         actions.Add(EventB);
         actions.Add(EventB); // Medium chance
@@ -73,19 +67,27 @@ public class Rounds : MonoBehaviour
         actions.Add(EventC); // Lower chance of being picked
     }
 
-    private void EventA()
+    private void DoorKnocking()
     {
-        Debug.Log("Horror Event A");
+        Debug.Log("Horror Event A triggered");
+        doorKnockingSFX.Play();
     }
 
     private void EventB()
     {
-        Debug.Log("Horror Event B");
+        Debug.Log("Horror Event B triggered");
     }
 
     private void EventC()
     {
-        Debug.Log("Horror Event C");
+        Debug.Log("Horror Event C triggered");
     }
 
 }
+
+//Debug.Log("Current Actions in List:: ");
+
+//foreach (var action in actions)
+//{
+//    Debug.Log(action.Method.Name); // Print functions name
+//}

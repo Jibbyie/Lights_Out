@@ -66,7 +66,6 @@ public class LightSwitchManager : MonoBehaviour
         lightsTurnedOffTime = 0f;
         lightsAreOff = true;
 
-        Debug.Log("Lights are off, tracking darkness time");
         Debug.Log("Global Lights Turned Off Counter: " + globalLightsTurnedOffCounter);
 
         rounds.ChooseRandomEvent();
