@@ -8,6 +8,7 @@ public class MainMenu : MonoBehaviour
     public AudioSource ambience;
     public GameObject loadingScreen;
     public GameObject playButton;
+    public GameObject quitButton;
 
     public void StartGame()
     {
@@ -18,7 +19,12 @@ public class MainMenu : MonoBehaviour
     {
         if (playButton != null)
         {
-            playButton.SetActive(false); // Hide Play button immediately
+            playButton.SetActive(false); 
+        }
+
+        if (quitButton != null)
+        {
+            quitButton.SetActive(false);
         }
 
         loadingScreen.SetActive(true); // Show loading screen immediately
@@ -36,5 +42,10 @@ public class MainMenu : MonoBehaviour
         Debug.Log("Audio Preloaded - Now Loading Game Scene...");
 
         SceneManager.LoadScene("Game");
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }
