@@ -1,8 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
+using Random = UnityEngine.Random;
 
 public class LightSwitchManager : MonoBehaviour
 {
+    public static event Action LightsTurnedOn;
+    public static event Action LightsTurnedOff;
+
     public LightSwitch[] switches; 
     private LightSwitch activeSwitch;
 
@@ -68,7 +73,8 @@ public class LightSwitchManager : MonoBehaviour
 
         Debug.Log("Global Lights Turned Off Counter: " + globalLightsTurnedOffCounter);
 
-        rounds.ChooseRandomEvent();
+        LightsTurnedOff?.Invoke(); // Fire the event but only if there are subscribers
+
         ActivateRandomSwitch();
     }
 
@@ -76,6 +82,7 @@ public class LightSwitchManager : MonoBehaviour
     {
         lightsAreOff = false;
         lightsTurnedOffTime = 0f;
+        LightsTurnedOn?.Invoke();
     }
 
     public void LightsOffTime()
@@ -107,5 +114,10 @@ public class LightSwitchManager : MonoBehaviour
     public float GetLightsOffTooLongTime()
     {
         return lightsOffTooLongTime;
+    }
+
+    public bool GetLightsTurnedOn()
+    {
+        return lightsAreOff;
     }
 }

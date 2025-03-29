@@ -6,6 +6,7 @@ using System;
 public class Rounds : MonoBehaviour
 {
     private LightSwitchManager switchManager;
+    private bool onLightsTurnedOn;
 
     private List<Action> actions = new List<Action>();
 
@@ -13,11 +14,16 @@ public class Rounds : MonoBehaviour
     public AudioSource doorKnockingSFX;
     public AudioSource behindYouSFX;
 
+    [Header("Game Objects")]
+    public GameObject entity;
+
     private int lastEventIndex = -1;
     private int lightsTurnedOffCounter;
 
     void Start()
     {
+        entity.SetActive(true);
+        entity.SetActive(false);
         switchManager = FindObjectOfType<LightSwitchManager>();
 
         PopulateActionList();
@@ -25,20 +31,27 @@ public class Rounds : MonoBehaviour
         if (switchManager != null)
         {
             lightsTurnedOffCounter = switchManager.GetLightsTurnedOffCount();
+            onLightsTurnedOn = switchManager.GetLightsTurnedOn();
         }
         else
         {
             Debug.LogError("SwitchManager not found in the scene!");
         }
+
+        LightSwitchManager.LightsTurnedOn += HandleLightsOn; // Subscribe to events in LightSwitchManager
+        LightSwitchManager.LightsTurnedOff += HandleLightsOff;
     }
 
-    void Update()
+    private void HandleLightsOn()
     {
-        if (switchManager != null)
-        {
-            lightsTurnedOffCounter = switchManager.GetLightsTurnedOffCount();
-        }
+
     }
+
+    private void HandleLightsOff()
+    {
+        ChooseRandomEvent(); 
+    }
+
 
     public void ChooseRandomEvent()
     {
@@ -50,7 +63,7 @@ public class Rounds : MonoBehaviour
             do
             {
                 randomIndex = UnityEngine.Random.Range(0, actions.Count);
-            } while (randomIndex == lastEventIndex && actions.Count > 1);
+            } while (randomIndex == lastEventIndex && actions.Count > 1); // While randomIndex is equal to lastEventIndex, redo (also check we are above 1 to account for the last item)
 
             lastEventIndex = randomIndex; // Store the new event index
             Action selectedEvent = actions[randomIndex];
@@ -75,6 +88,7 @@ public class Rounds : MonoBehaviour
     void PopulateActionList()
     {
         // Do Nothing Event (Most Common)
+        /*
         actions.Add(DoNothing);
         actions.Add(DoNothing);
         actions.Add(DoNothing);
@@ -89,9 +103,10 @@ public class Rounds : MonoBehaviour
         // Uncommon Events
         actions.Add(BehindYou);
         actions.Add(BehindYou);
+        */
 
         // Rare Event (Only add once)
-        actions.Add(EventC); 
+        actions.Add(MirrorSpawn); 
     }
 
     private IEnumerator SFXDelay(float delay, AudioSource sfx)
@@ -107,7 +122,7 @@ public class Rounds : MonoBehaviour
 
     private void DoorKnocking()
     {
-        Debug.Log("Horror Event A triggered");
+        Debug.Log("Door Knocking event triggered");
         if(doorKnockingSFX != null)
         {
             StartCoroutine(SFXDelay(1.0f, doorKnockingSFX));
@@ -116,16 +131,17 @@ public class Rounds : MonoBehaviour
 
     private void BehindYou()
     {
-        Debug.Log("Horror Event B triggered");
+        Debug.Log("Whisper Behind You event triggered");
         if(behindYouSFX != null)
         {
             StartCoroutine(SFXDelay(2.0f, behindYouSFX));
         }
     }
 
-    private void EventC()
+    private void MirrorSpawn()
     {
-        Debug.Log("Horror Event C triggered");
+        entity.SetActive(true);
+        Debug.Log("Mirror spawned");
     }
 
 }
