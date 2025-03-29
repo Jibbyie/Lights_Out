@@ -670,11 +670,10 @@ MonoBehaviour:
   switchTurnOn: {fileID: 2114745886}
   switchTurnOff: {fileID: 1912428878}
   ambience: {fileID: 1259489293}
-  lightsTurnedOffTime: 0
-  lightsOffTooLongTime: 20
   campingSwitch: {fileID: 302726719}
   jumpScares: {fileID: 302726720}
   endGame: {fileID: 302726721}
+  lightSwitchManager: {fileID: 1624035995}
 --- !u!65 &132176958
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5915,11 +5914,10 @@ MonoBehaviour:
   switchTurnOn: {fileID: 2114745886}
   switchTurnOff: {fileID: 1912428878}
   ambience: {fileID: 1259489293}
-  lightsTurnedOffTime: 0
-  lightsOffTooLongTime: 20
   campingSwitch: {fileID: 302726719}
   jumpScares: {fileID: 302726720}
   endGame: {fileID: 302726721}
+  lightSwitchManager: {fileID: 1624035995}
 --- !u!54 &1261706059
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6152,11 +6150,10 @@ MonoBehaviour:
   switchTurnOn: {fileID: 2114745886}
   switchTurnOff: {fileID: 1912428878}
   ambience: {fileID: 1259489293}
-  lightsTurnedOffTime: 0
-  lightsOffTooLongTime: 20
   campingSwitch: {fileID: 302726719}
   jumpScares: {fileID: 302726720}
   endGame: {fileID: 302726721}
+  lightSwitchManager: {fileID: 1624035995}
 --- !u!54 &1283447080
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7581,11 +7578,10 @@ MonoBehaviour:
   switchTurnOn: {fileID: 2114745886}
   switchTurnOff: {fileID: 1912428878}
   ambience: {fileID: 1259489293}
-  lightsTurnedOffTime: 0
-  lightsOffTooLongTime: 20
   campingSwitch: {fileID: 302726719}
   jumpScares: {fileID: 302726720}
   endGame: {fileID: 302726721}
+  lightSwitchManager: {fileID: 1624035995}
 --- !u!54 &1585468951
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7772,11 +7768,10 @@ MonoBehaviour:
   switchTurnOn: {fileID: 2114745886}
   switchTurnOff: {fileID: 1912428878}
   ambience: {fileID: 1259489293}
-  lightsTurnedOffTime: 0
-  lightsOffTooLongTime: 20
   campingSwitch: {fileID: 302726719}
   jumpScares: {fileID: 302726720}
   endGame: {fileID: 302726721}
+  lightSwitchManager: {fileID: 1624035995}
 --- !u!54 &1598370663
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -8352,6 +8347,8 @@ MonoBehaviour:
   - {fileID: 1261706058}
   - {fileID: 1598370662}
   - {fileID: 1585468950}
+  lightsTurnedOffTime: 0
+  lightsOffTooLongTime: 20
   globalLightsTurnedOffCounter: 0
 --- !u!4 &1628181777 stripped
 Transform:

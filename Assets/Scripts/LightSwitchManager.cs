@@ -5,6 +5,8 @@ public class LightSwitchManager : MonoBehaviour
 {
     public LightSwitch[] switches; // Assign all switches in the Inspector
     private LightSwitch activeSwitch;
+
+    public float lightsOffTooLongTime = 20f;
     public int globalLightsTurnedOffCounter = 0; // Global counter for all switches
 
     private void Start()

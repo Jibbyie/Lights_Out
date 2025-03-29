@@ -86,7 +86,23 @@ public class LightSwitch : MonoBehaviour
 
     IEnumerator LightOffCountdown()
     {
-        float waitTime = Random.Range(5f, 15f);
+        float waitTime;
+        if (endGame.endGameTimer < 10)
+        {
+            waitTime = Random.Range(15f, 20f);
+            Debug.Log("Round 1 " + waitTime);
+        }
+        else if (endGame.endGameTimer < 20)
+        {
+            waitTime = Random.Range(5f, 8f);
+            Debug.Log("Round 2 " + waitTime);
+        }
+        else
+        {
+            waitTime = Random.Range(1f, 5f);
+            Debug.Log("Round 3" + waitTime);
+        }
+
         yield return new WaitForSeconds(waitTime);
 
         lightIsOn = false;
