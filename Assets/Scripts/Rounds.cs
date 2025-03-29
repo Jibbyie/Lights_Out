@@ -19,6 +19,7 @@ public class Rounds : MonoBehaviour
     public AudioSource behindYouSFX;
     public AudioSource mirrorWhispersSFX;
     public AudioSource mirrorWhispers2SFX;
+    public AudioSource footstepsSFX;
 
     [Header("Game Objects")]
     public GameObject mirror1;
@@ -137,6 +138,9 @@ public class Rounds : MonoBehaviour
 
     void PopulateActionList()
     {
+        actions.Add(Footsteps);
+        actions.Add(BehindYou);
+        actions.Add(DoorKnocking);
         // Do Nothing Event (Most Common)
         /*
         actions.Add(DoNothing);
@@ -157,17 +161,6 @@ public class Rounds : MonoBehaviour
 
         // Rare Event (Only add once)
         actions.Add(MirrorSpawn); 
-    }
-
-    private IEnumerator SFXDelay(float delay, AudioSource sfx)
-    {
-        yield return new WaitForSeconds(delay);
-        sfx.Play();
-    }
-
-    private IEnumerator Delay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
     }
 
     private void DoNothing()
@@ -193,12 +186,31 @@ public class Rounds : MonoBehaviour
         }
     }
 
+    private void Footsteps()
+    {
+        Debug.Log("Footsteps behind you played");
+        if (footstepsSFX != null)
+        {
+            StartCoroutine(SFXDelay(1.0f, footstepsSFX));
+        }
+}
     private void MirrorSpawn()
     {
         mirror1.SetActive(true);
         mirror1Active = true;
         mirrorWhispersSFX.Play();
         Debug.Log("Mirror spawned");
+    }
+
+    private IEnumerator SFXDelay(float delay, AudioSource sfx)
+    {
+        yield return new WaitForSeconds(delay);
+        sfx.Play();
+    }
+
+    private IEnumerator Delay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
     }
 
     void StopAllAudio()
