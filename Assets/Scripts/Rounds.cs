@@ -6,13 +6,17 @@ using System;
 public class Rounds : MonoBehaviour
 {
     private LightSwitchManager switchManager;
+    private PauseMenu pauseMenu;
     private bool onLightsTurnedOn;
+    private bool entityActive = false;
 
     private List<Action> actions = new List<Action>();
 
     [Header("Audio SFX")]
+    private AudioSource[] allAudioSources;
     public AudioSource doorKnockingSFX;
     public AudioSource behindYouSFX;
+    public AudioSource mirrorWhispersSFX;
 
     [Header("Game Objects")]
     public GameObject entity;
@@ -25,6 +29,7 @@ public class Rounds : MonoBehaviour
         entity.SetActive(true);
         entity.SetActive(false);
         switchManager = FindObjectOfType<LightSwitchManager>();
+        pauseMenu = FindObjectOfType<PauseMenu>();
 
         PopulateActionList();
 
@@ -42,14 +47,33 @@ public class Rounds : MonoBehaviour
         LightSwitchManager.LightsTurnedOff += HandleLightsOff;
     }
 
+    private void Update()
+    {
+        if(pauseMenu.isGamePaused)
+        {
+            StopAllAudio();
+        }
+        else
+        {
+            ResumeAllAudio();
+        }
+    }
+
     private void HandleLightsOn()
     {
-
+        if(entityActive)
+        {
+            mirrorWhispersSFX.Stop();
+        }
     }
 
     private void HandleLightsOff()
     {
-        ChooseRandomEvent(); 
+        ChooseRandomEvent();
+        if (entityActive)
+        {
+            mirrorWhispersSFX.Play();
+        }
     }
 
 
@@ -141,9 +165,28 @@ public class Rounds : MonoBehaviour
     private void MirrorSpawn()
     {
         entity.SetActive(true);
+        entityActive = true;
+        mirrorWhispersSFX.Play();
         Debug.Log("Mirror spawned");
     }
 
+    void StopAllAudio()
+    {
+        allAudioSources = FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
+        foreach(AudioSource audioS in allAudioSources)
+        {
+            audioS.Pause();
+        }
+    }
+
+    void ResumeAllAudio()
+    {
+        allAudioSources = FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
+        foreach(AudioSource audioS in allAudioSources)
+        {
+            audioS.UnPause();
+        }
+    }
 }
 
 //Debug.Log("Current Actions in List:: ");

@@ -8,7 +8,7 @@ public class PauseMenu : MonoBehaviour
     // Stop all sounds
     private AudioSource[] allAudioSources;
 
-    private bool isGamePaused = false;
+    public bool isGamePaused = false;
     public GameObject pauseMenu;
 
     public void Start()
