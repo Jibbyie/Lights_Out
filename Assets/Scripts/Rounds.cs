@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using System;
 
@@ -8,7 +9,11 @@ public class Rounds : MonoBehaviour
 
     private List<Action> actions = new List<Action>();
 
+    [Header("Audio SFX")]
     public AudioSource doorKnockingSFX;
+    public AudioSource behindYouSFX;
+
+    private int lastEventIndex = -1;
     private int lightsTurnedOffCounter;
 
     void Start()
@@ -39,12 +44,27 @@ public class Rounds : MonoBehaviour
     {
         if (actions.Count > 0)
         {
-            int randomIndex = UnityEngine.Random.Range(0, actions.Count);
-            Action selectedEvent = actions[randomIndex];
-            selectedEvent.Invoke(); // Randomly call selected horror function from actions list
+            int randomIndex;
 
-            actions.RemoveAll(a => a == selectedEvent); // Remove selected function and all instances of it
-                                                        // to remove super common events
+            // Ensure a different event than last time (checking for common events)
+            do
+            {
+                randomIndex = UnityEngine.Random.Range(0, actions.Count);
+            } while (randomIndex == lastEventIndex && actions.Count > 1);
+
+            lastEventIndex = randomIndex; // Store the new event index
+            Action selectedEvent = actions[randomIndex];
+            selectedEvent.Invoke(); 
+
+            // Remove only ONE instance of DoNothing if chosen
+            if (selectedEvent == DoNothing)
+            {
+                actions.Remove(selectedEvent);
+            }
+            else
+            {
+                actions.RemoveAll(a => a == selectedEvent); // Fully remove normal events
+            }
         }
         else
         {
@@ -54,28 +74,53 @@ public class Rounds : MonoBehaviour
 
     void PopulateActionList()
     {
-        // Common Events (Added multiple times)
-        actions.Add(DoorKnocking);
-        actions.Add(DoorKnocking);
-        actions.Add(DoorKnocking);
-        actions.Add(DoorKnocking); // Higher chance of being picked
+        // Do Nothing Event (Most Common)
+        actions.Add(DoNothing);
+        actions.Add(DoNothing);
+        actions.Add(DoNothing);
+        actions.Add(DoNothing);
+        actions.Add(DoNothing);
 
-        actions.Add(EventB);
-        actions.Add(EventB); // Medium chance
+        // Common Events (Add multiple times)
+        actions.Add(DoorKnocking);
+        actions.Add(DoorKnocking);
+        actions.Add(DoorKnocking); 
 
-        // Rare Event (Only added once)
-        actions.Add(EventC); // Lower chance of being picked
+        // Uncommon Events
+        actions.Add(BehindYou);
+        actions.Add(BehindYou);
+
+        // Rare Event (Only add once)
+        actions.Add(EventC); 
+    }
+
+    private IEnumerator SFXDelay(float delay, AudioSource sfx)
+    {
+        yield return new WaitForSeconds(delay);
+        sfx.Play();
+    }
+
+    private void DoNothing()
+    {
+        Debug.Log("Nothing happens");
     }
 
     private void DoorKnocking()
     {
         Debug.Log("Horror Event A triggered");
-        doorKnockingSFX.Play();
+        if(doorKnockingSFX != null)
+        {
+            StartCoroutine(SFXDelay(1.0f, doorKnockingSFX));
+        }
     }
 
-    private void EventB()
+    private void BehindYou()
     {
         Debug.Log("Horror Event B triggered");
+        if(behindYouSFX != null)
+        {
+            StartCoroutine(SFXDelay(2.0f, behindYouSFX));
+        }
     }
 
     private void EventC()
