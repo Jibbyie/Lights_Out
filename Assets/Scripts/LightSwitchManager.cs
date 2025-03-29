@@ -7,6 +7,7 @@ public class LightSwitchManager : MonoBehaviour
     private LightSwitch activeSwitch;
 
     private EndGame endGame;
+    private Rounds rounds;
 
     public float lightsTurnedOffTime = 0f;
     public float lightsOffTooLongTime = 20f;
@@ -18,6 +19,7 @@ public class LightSwitchManager : MonoBehaviour
     {
         lightsAreOff = false;
         endGame = FindObjectOfType<EndGame>();
+        rounds = FindObjectOfType<Rounds>();    
 
         // Ensure all switches are deactivated at start
         foreach (LightSwitch switchObj in switches)
@@ -67,6 +69,7 @@ public class LightSwitchManager : MonoBehaviour
         Debug.Log("Lights are off, tracking darkness time");
         Debug.Log("Global Lights Turned Off Counter: " + globalLightsTurnedOffCounter);
 
+        rounds.ChooseRandomEvent();
         ActivateRandomSwitch();
     }
 
