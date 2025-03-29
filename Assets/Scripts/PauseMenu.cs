@@ -1,9 +1,13 @@
 using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine;
+using Unity.VisualScripting;
 
 public class PauseMenu : MonoBehaviour
 {
+    // Stop all sounds
+    private AudioSource[] allAudioSources;
+
     private bool isGamePaused = false;
     public GameObject pauseMenu;
 
@@ -30,6 +34,8 @@ public class PauseMenu : MonoBehaviour
 
     private void PauseGame()
     {
+        StopAllAudio();
+
         isGamePaused = true;
         pauseMenu.SetActive(true);
 
@@ -41,6 +47,8 @@ public class PauseMenu : MonoBehaviour
 
     public void ContinueGame()
     {
+        ResumeAllAudio();
+
         isGamePaused = false;
         pauseMenu.SetActive(false);
 
@@ -55,4 +63,29 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }
+
+    void StopAllAudio()
+    {
+        allAudioSources = FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
+        foreach (AudioSource audioS in allAudioSources)
+        {
+            if (audioS.gameObject.name.Contains("Ambience") || audioS.gameObject.name.Contains("Whisper1") || audioS.gameObject.name.Contains("Whisper2") || audioS.gameObject.name.Contains("Whisper3") || audioS.gameObject.name.Contains("Step")) 
+            {
+                audioS.Pause(); // Pause instead of stopping it
+            }
+        }
+    }
+
+    void ResumeAllAudio()
+    {
+        allAudioSources = FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
+        foreach (AudioSource audioS in allAudioSources)
+        {
+            if (audioS.gameObject.name.Contains("Ambience") || audioS.gameObject.name.Contains("Whisper1") || audioS.gameObject.name.Contains("Whisper2") || audioS.gameObject.name.Contains("Whisper3") || audioS.gameObject.name.Contains("Step"))
+            {
+                audioS.UnPause(); 
+            }
+        }
+    }
+
 }
