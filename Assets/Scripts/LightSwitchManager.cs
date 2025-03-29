@@ -88,7 +88,7 @@ public class LightSwitchManager : MonoBehaviour
         }
         else
         {
-            lightsOffTooLongTime = 8f;
+            lightsOffTooLongTime = 10f;
         }
     }
 
