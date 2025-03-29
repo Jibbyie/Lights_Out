@@ -3,14 +3,22 @@ using System.Collections.Generic;
 
 public class LightSwitchManager : MonoBehaviour
 {
-    public LightSwitch[] switches; // Assign all switches in the Inspector
+    public LightSwitch[] switches; 
     private LightSwitch activeSwitch;
 
+    private EndGame endGame;
+
+    public float lightsTurnedOffTime = 0f;
     public float lightsOffTooLongTime = 20f;
-    public int globalLightsTurnedOffCounter = 0; // Global counter for all switches
+    public int globalLightsTurnedOffCounter = 0;
+
+    public bool lightsAreOff = false;
 
     private void Start()
     {
+        lightsAreOff = false;
+        endGame = FindObjectOfType<EndGame>();
+
         // Ensure all switches are deactivated at start
         foreach (LightSwitch switchObj in switches)
         {
@@ -19,6 +27,15 @@ public class LightSwitchManager : MonoBehaviour
 
         // Activate the first random switch
         ActivateRandomSwitch();
+    }
+
+    private void Update()
+    {
+        if(lightsAreOff)
+        {
+            lightsTurnedOffTime += Time.deltaTime;
+        }
+        LightsOffTime();
     }
 
     public void ActivateRandomSwitch()
@@ -41,17 +58,52 @@ public class LightSwitchManager : MonoBehaviour
         activeSwitch = newSwitch;
     }
 
-    // This method is called when any LightSwitch turns off
     public void OnLightsTurnedOff()
     {
-        globalLightsTurnedOffCounter++; // Increment global counter
+        globalLightsTurnedOffCounter++;
+        lightsTurnedOffTime = 0f;
+        lightsAreOff = true;
+
+        Debug.Log("Lights are off, tracking darkness time");
         Debug.Log("Global Lights Turned Off Counter: " + globalLightsTurnedOffCounter);
 
         ActivateRandomSwitch();
     }
 
-    public int GetLightsTurnedOffCount()
+    public void OnLightsTurnedOn()
+    {
+        lightsAreOff = false;
+        lightsTurnedOffTime = 0f;
+    }
+
+    public void LightsOffTime()
+    {
+        if (endGame.endGameTimer < 60)
+        {
+            lightsOffTooLongTime = 20f;
+        }
+        else if (endGame.endGameTimer < 120)
+        {
+            lightsOffTooLongTime = 15f;
+        }
+        else
+        {
+            lightsOffTooLongTime = 8f;
+        }
+    }
+
+    public int GetLightsTurnedOffCount() // Used for round based system script
     {
         return globalLightsTurnedOffCounter;
+    }
+
+    public float GetLightsTurnedOffTime()
+    {
+        return lightsTurnedOffTime;
+    }
+
+    public float GetLightsOffTooLongTime()
+    {
+        return lightsOffTooLongTime;
     }
 }

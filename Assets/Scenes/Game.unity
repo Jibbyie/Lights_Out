@@ -670,10 +670,6 @@ MonoBehaviour:
   switchTurnOn: {fileID: 2114745886}
   switchTurnOff: {fileID: 1912428878}
   ambience: {fileID: 1259489293}
-  campingSwitch: {fileID: 302726719}
-  jumpScares: {fileID: 302726720}
-  endGame: {fileID: 302726721}
-  lightSwitchManager: {fileID: 1624035995}
 --- !u!65 &132176958
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1583,6 +1579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpScareSFX: {fileID: 106679138}
+  lightSwitchOff: {fileID: 1912428878}
 --- !u!114 &302726721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5914,10 +5911,6 @@ MonoBehaviour:
   switchTurnOn: {fileID: 2114745886}
   switchTurnOff: {fileID: 1912428878}
   ambience: {fileID: 1259489293}
-  campingSwitch: {fileID: 302726719}
-  jumpScares: {fileID: 302726720}
-  endGame: {fileID: 302726721}
-  lightSwitchManager: {fileID: 1624035995}
 --- !u!54 &1261706059
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6150,10 +6143,6 @@ MonoBehaviour:
   switchTurnOn: {fileID: 2114745886}
   switchTurnOff: {fileID: 1912428878}
   ambience: {fileID: 1259489293}
-  campingSwitch: {fileID: 302726719}
-  jumpScares: {fileID: 302726720}
-  endGame: {fileID: 302726721}
-  lightSwitchManager: {fileID: 1624035995}
 --- !u!54 &1283447080
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7578,10 +7567,6 @@ MonoBehaviour:
   switchTurnOn: {fileID: 2114745886}
   switchTurnOff: {fileID: 1912428878}
   ambience: {fileID: 1259489293}
-  campingSwitch: {fileID: 302726719}
-  jumpScares: {fileID: 302726720}
-  endGame: {fileID: 302726721}
-  lightSwitchManager: {fileID: 1624035995}
 --- !u!54 &1585468951
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7768,10 +7753,6 @@ MonoBehaviour:
   switchTurnOn: {fileID: 2114745886}
   switchTurnOff: {fileID: 1912428878}
   ambience: {fileID: 1259489293}
-  campingSwitch: {fileID: 302726719}
-  jumpScares: {fileID: 302726720}
-  endGame: {fileID: 302726721}
-  lightSwitchManager: {fileID: 1624035995}
 --- !u!54 &1598370663
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -8350,6 +8331,7 @@ MonoBehaviour:
   lightsTurnedOffTime: 0
   lightsOffTooLongTime: 20
   globalLightsTurnedOffCounter: 0
+  lightsAreOff: 0
 --- !u!4 &1628181777 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 463726, guid: e8844f0074e08e146ac42fb5eaeab3db,

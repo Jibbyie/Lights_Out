@@ -17,7 +17,7 @@ public class CampingSwitch : MonoBehaviour
 
     public float campingTimeThreshold1 = 5f;
     public float campingTimeThreshold2 = 15f;
-    public float maxCampingTime = 30f; 
+    public float maxCampingTime = 25f; 
 
     private void Update()
     {
@@ -37,10 +37,6 @@ public class CampingSwitch : MonoBehaviour
                 StartCoroutine(ShowBackAwayText2());
             }
 
-            if (timeNearSwitch >= maxCampingTime)
-            {
-                TriggerCampingPunishment();
-            }
         }
     }
 
@@ -52,6 +48,16 @@ public class CampingSwitch : MonoBehaviour
         {
             // Do not reset the timer, so cumulative camping is counted
         }
+    }
+
+    public float TimeNearSwitch()
+    {
+        return timeNearSwitch;
+    }
+
+    public float MaxCampingTime()
+    {
+        return maxCampingTime;
     }
 
     IEnumerator ShowBackAwayText()
@@ -90,8 +96,4 @@ public class CampingSwitch : MonoBehaviour
         backAwayText2.gameObject.SetActive(false);
     }
 
-    private void TriggerCampingPunishment()
-    {
-        Debug.Log("Player camped too long! Trigger horror event here.");
-    }
 }

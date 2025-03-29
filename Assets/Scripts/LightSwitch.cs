@@ -5,30 +5,27 @@ using TMPro;
 public class LightSwitch : MonoBehaviour
 {
     public GameObject intIcon, lightOn;
+    private CampingSwitch campingSwitch;
+    private LightSwitchManager lightSwitchManager;
+    private EndGame endGame;
+
     public bool lightIsOn = false;
+    private bool playerInRange = false;
 
     public AudioSource switchTurnOn;
     public AudioSource switchTurnOff;
     public AudioSource ambience;
 
     private Coroutine lightOffTimer;
-    public float lightsTurnedOffTime = 0f;
-    public float lightsOffTooLongTime = 20f;
-
-    private bool playerInRange = false;
-    public CampingSwitch campingSwitch;
-    public JumpScares jumpScares;
-    public EndGame endGame;
 
     private void Start()
     {
         RenderSettings.fog = true;
         lightOn.SetActive(false);
 
-        // Ensure all references are assigned in the Inspector
-        if (campingSwitch == null) Debug.LogError("CampingSwitch is not assigned in LightSwitch!");
-        if (jumpScares == null) Debug.LogError("JumpScares is not assigned in LightSwitch!");
-        if (endGame == null) Debug.LogError("EndGame is not assigned in LightSwitch!");
+        campingSwitch = FindObjectOfType<CampingSwitch>();
+        lightSwitchManager = FindObjectOfType<LightSwitchManager>();
+        endGame = FindObjectOfType<EndGame>();
     }
 
     private void Update()
@@ -37,8 +34,6 @@ public class LightSwitch : MonoBehaviour
         {
             TurnOnLights();
         }
-
-        TriggerEarlyJumpScare();
     }
 
     private void OnTriggerStay(Collider other)
@@ -80,6 +75,9 @@ public class LightSwitch : MonoBehaviour
             ambience.Play();
         }
 
+        lightSwitchManager.OnLightsTurnedOn();
+        endGame.StartGameTimer();
+
         if (lightOffTimer != null) StopCoroutine(lightOffTimer);
         lightOffTimer = StartCoroutine(LightOffCountdown());
     }
@@ -87,20 +85,20 @@ public class LightSwitch : MonoBehaviour
     IEnumerator LightOffCountdown()
     {
         float waitTime;
-        if (endGame.endGameTimer < 10)
+        if (endGame.endGameTimer < 60)
         {
-            waitTime = Random.Range(15f, 20f);
-            Debug.Log("Round 1 " + waitTime);
+            waitTime = Random.Range(12f, 16f);
+            Debug.Log("Round 1 wait time " + waitTime);
         }
-        else if (endGame.endGameTimer < 20)
+        else if (endGame.endGameTimer < 120)
         {
-            waitTime = Random.Range(5f, 8f);
-            Debug.Log("Round 2 " + waitTime);
+            waitTime = Random.Range(8f, 12f);
+            Debug.Log("Round 2 wait time " + waitTime);
         }
         else
         {
             waitTime = Random.Range(1f, 5f);
-            Debug.Log("Round 3" + waitTime);
+            Debug.Log("Round 3 wait time " + waitTime);
         }
 
         yield return new WaitForSeconds(waitTime);
@@ -112,26 +110,7 @@ public class LightSwitch : MonoBehaviour
         ambience.Stop();
 
         // Update the global counter in SwitchManager
-        FindObjectOfType<LightSwitchManager>()?.OnLightsTurnedOff();
+        lightSwitchManager.OnLightsTurnedOff();
     }
 
-
-    private void TriggerEarlyJumpScare()
-    {
-        if (!lightIsOn)
-        {
-            lightsTurnedOffTime += Time.deltaTime;
-            if (lightsTurnedOffTime >= lightsOffTooLongTime)
-            {
-                if (jumpScares != null)
-                {
-                    jumpScares.TriggerJumpScare();
-                }
-            }
-        }
-        else
-        {
-            lightsTurnedOffTime = 0f;
-        }
-    }
 }

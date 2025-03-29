@@ -1,11 +1,15 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
+
 
 public class EndGame : MonoBehaviour
 {
     public float endGameTime = 180f; 
-    public float endGameTimer = 0f; 
+    public float endGameTimer = 0f;
 
-    private JumpScares jumpScares; 
+    private JumpScares jumpScares;
+    private bool hasGameStarted = false;
 
     private void Start()
     {
@@ -14,21 +18,27 @@ public class EndGame : MonoBehaviour
 
     private void Update()
     {
-        endGameTimer += Time.deltaTime;
-
-        if (endGameTimer >= endGameTime)
+        if (hasGameStarted) 
         {
-            TriggerGameEnd();
+            endGameTimer += Time.deltaTime;
+            if (endGameTimer >= endGameTime)
+            {
+                TriggerGameEnd();
+            }
+        }
+    }
+
+    public void StartGameTimer()
+    {
+        if (!hasGameStarted)
+        {
+            hasGameStarted = true;
+            Debug.Log("Game timer started!");
         }
     }
 
     private void TriggerGameEnd()
     {
-        if (jumpScares != null)
-        {
-            jumpScares.TriggerJumpScare();
-        }
-
-        Debug.Log("Game Over! Final Jumpscare Triggered.");
+        SceneManager.LoadScene("YouSurvived");
     }
 }
