@@ -68,7 +68,7 @@ public class Rounds : MonoBehaviour
 
     private void HandleLightsOn()
     {
-        if(mirror1Active)
+        if(mirror1Active && lightsTurnedOffCounter < 1)
         {
             mirrorWhispersSFX.Stop();
         }
@@ -87,14 +87,17 @@ public class Rounds : MonoBehaviour
         {
             mirrorWhispersSFX.Play();
         }
-        if (lightsTurnedOffCounter >= 1)
+        if (lightsTurnedOffCounter > 2)
         {
             mirror1.SetActive(false);
+            mirrorWhispersSFX.Stop();
+
             mirror2.SetActive(true);
             mirror2Active = true;
         }
         if (mirror2Active)
         {
+            StartCoroutine(Delay(0.1f));
             mirrorWhispers2SFX.Play();
         }
     }
@@ -160,6 +163,11 @@ public class Rounds : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         sfx.Play();
+    }
+
+    private IEnumerator Delay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
     }
 
     private void DoNothing()
