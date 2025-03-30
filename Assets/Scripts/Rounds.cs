@@ -24,12 +24,17 @@ public class Rounds : MonoBehaviour
     [Header("Game Objects")]
     public GameObject mirror1;
     public GameObject mirror2;
+    public GameObject roomProps;
+    public GameObject table;
 
     private int lastEventIndex = -1;
     private int lightsTurnedOffCounter;
 
     void Start()
     {
+        Debug.Log(table.transform.position);
+        Debug.Log(table.transform.rotation);
+
         // Mirrors preloading
         mirror1.SetActive(true);
         mirror1.SetActive(false);
@@ -88,9 +93,10 @@ public class Rounds : MonoBehaviour
         {
             mirrorWhispersSFX.Play();
         }
-        if (lightsTurnedOffCounter > 2)
+        if (lightsTurnedOffCounter > 2 && mirror1Active)
         {
             mirror1.SetActive(false);
+            mirror1Active = false;
             mirrorWhispersSFX.Stop();
 
             mirror2.SetActive(true);
@@ -138,9 +144,11 @@ public class Rounds : MonoBehaviour
 
     void PopulateActionList()
     {
-        actions.Add(Footsteps);
-        actions.Add(BehindYou);
-        actions.Add(DoorKnocking);
+        actions.Add(PutTableOnCeiling);
+        //actions.Add(ShiftTheRoom);
+        //actions.Add(Footsteps);
+        //actions.Add(BehindYou);
+        //actions.Add(DoorKnocking);
         // Do Nothing Event (Most Common)
         /*
         actions.Add(DoNothing);
@@ -160,7 +168,7 @@ public class Rounds : MonoBehaviour
         */
 
         // Rare Event (Only add once)
-        actions.Add(MirrorSpawn); 
+        //actions.Add(MirrorSpawn); 
     }
 
     private void DoNothing()
@@ -184,6 +192,17 @@ public class Rounds : MonoBehaviour
         {
             StartCoroutine(SFXDelay(2.0f, behindYouSFX));
         }
+    }
+
+    private void ShiftTheRoom()
+    {
+        roomProps.transform.rotation = Quaternion.Euler(0, -13.5f, 0);
+    }
+
+    private void PutTableOnCeiling()
+    {
+        table.transform.position = new Vector3(-1.54f, 2.80f, 4.05f);
+        table.transform.rotation = new Quaternion(0.35849f, 0f, 0.93353f, 0f);
     }
 
     private void Footsteps()

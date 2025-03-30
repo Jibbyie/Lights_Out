@@ -18,6 +18,8 @@ public class EndGame : MonoBehaviour
 
     private void Update()
     {
+        if (DebugFlags.IsDebugging) return;
+
         if (hasGameStarted) 
         {
             endGameTimer += Time.deltaTime;

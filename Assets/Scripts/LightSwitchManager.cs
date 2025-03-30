@@ -87,6 +87,8 @@ public class LightSwitchManager : MonoBehaviour
 
     public void LightsOffTime()
     {
+        if (DebugFlags.IsDebugging) return;
+
         if (endGame.endGameTimer < 60)
         {
             lightsOffTooLongTime = 20f;

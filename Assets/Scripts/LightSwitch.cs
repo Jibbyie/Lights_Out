@@ -79,7 +79,11 @@ public class LightSwitch : MonoBehaviour
         endGame.StartGameTimer();
 
         if (lightOffTimer != null) StopCoroutine(lightOffTimer);
-        lightOffTimer = StartCoroutine(LightOffCountdown());
+
+        if (!DebugFlags.IsDebugging)
+        {
+            lightOffTimer = StartCoroutine(LightOffCountdown());
+        }
     }
 
     IEnumerator LightOffCountdown()
