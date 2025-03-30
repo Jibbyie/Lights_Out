@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using System;
+using System.Reflection;
 
 public class Rounds : MonoBehaviour
 {
@@ -249,6 +250,28 @@ public class Rounds : MonoBehaviour
             audioS.UnPause();
         }
     }
+
+
+    //
+    //
+    // DEBUGGING
+    //
+    //
+
+    public void TriggerRoundByName(string methodName)
+    {
+        var method = typeof(Rounds).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+        if (method != null)
+        {
+            method.Invoke(this, null);
+            Debug.Log($"DEBUG: Triggered round '{methodName}'");
+        }
+        else
+        {
+            Debug.LogWarning($"DEBUG: Round method '{methodName}' not found.");
+        }
+    }
+
 }
 
 //Debug.Log("Current Actions in List:: ");
@@ -257,3 +280,4 @@ public class Rounds : MonoBehaviour
 //{
 //    Debug.Log(action.Method.Name); // Print functions name
 //}
+

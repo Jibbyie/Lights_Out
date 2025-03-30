@@ -2,41 +2,54 @@
 using UnityEngine;
 using UnityEditor;
 using System.Reflection;
+using System.Linq;
+using System.Collections.Generic;
 
 public class DebugController : MonoBehaviour
 {
     private LightSwitchManager switchManager;
-    private Rounds rounds;
+    public Rounds rounds;
+
+    [Header("Trigger Round By Name")]
+    public int selectedRoundIndex = 0;
+    public string[] roundMethodOptions;
+    private List<string> roundMethodNames = new List<string>();
+
+    [Header("Manual Round Trigger (Fallback)")]
+    public string roundMethodName = "";
+    public bool triggerNamedRound = false;
 
     void Start()
     {
         DebugFlags.IsDebugging = true;
+
         switchManager = FindObjectOfType<LightSwitchManager>();
-        rounds = FindObjectOfType<Rounds>();
+        if (rounds == null) rounds = FindObjectOfType<Rounds>();
+
+        // Collect private void methods from Rounds
+        if (rounds != null)
+        {
+            var methods = typeof(Rounds)
+                .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(m => m.ReturnType == typeof(void) && m.GetParameters().Length == 0)
+                .Select(m => m.Name)
+                .ToList();
+
+            roundMethodNames = methods;
+            roundMethodOptions = methods.ToArray();
+        }
     }
 
     void Update()
     {
         // F1: Force lights ON
-        if (Input.GetKeyDown(KeyCode.F1))
-        {
-            Debug.Log("DEBUG (F1): Forcing Lights On");
-            SimulateLightsOn();
-        }
+        if (Input.GetKeyDown(KeyCode.F1)) SimulateLightsOn();
 
         // F2: Force lights OFF
-        if (Input.GetKeyDown(KeyCode.F2))
-        {
-            Debug.Log("DEBUG (F2): Simulating Lights Off");
-            SimulateLightsOff();
-        }
+        if (Input.GetKeyDown(KeyCode.F2)) SimulateLightsOff();
 
         // F3: Trigger random horror event
-        if (Input.GetKeyDown(KeyCode.F3))
-        {
-            Debug.Log("DEBUG (F3): Triggering random horror event");
-            rounds?.ChooseRandomEvent();
-        }
+        if (Input.GetKeyDown(KeyCode.F3)) rounds?.ChooseRandomEvent();
 
         // F4: Increment lightsTurnedOffCounter manually
         if (Input.GetKeyDown(KeyCode.F4))
@@ -46,7 +59,6 @@ public class DebugController : MonoBehaviour
             typeof(LightSwitchManager)
                 .GetField("globalLightsTurnedOffCounter", BindingFlags.Public | BindingFlags.Instance)
                 ?.SetValue(switchManager, newCount);
-
 
             Debug.Log($"DEBUG (F4): lightsTurnedOffCounter set to {newCount}");
         }
@@ -61,35 +73,52 @@ public class DebugController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F6))
         {
             var js = FindObjectOfType<JumpScares>();
-            if (js != null)
-            {
-                Debug.Log("DEBUG (F6): Triggering normal jumpscare");
-                js.TriggerJumpScare();
-            }
+            js?.TriggerJumpScare();
         }
 
         // F7: Trigger early jumpscare
         if (Input.GetKeyDown(KeyCode.F7))
         {
             var js = FindObjectOfType<JumpScares>();
-            if (js != null)
-            {
-                Debug.Log("DEBUG (F7): Triggering early jumpscare");
-                js.TriggerEarlyJumpScare();
-            }
+            js?.TriggerEarlyJumpScare();
         }
 
         // F8: Trigger endgame manually
         if (Input.GetKeyDown(KeyCode.F8))
         {
             var endGame = FindObjectOfType<EndGame>();
-            if (endGame != null)
-            {
-                Debug.Log("DEBUG (F8): Triggering manual endgame");
-                typeof(EndGame)
-                    .GetMethod("TriggerGameEnd", BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?.Invoke(endGame, null);
-            }
+            typeof(EndGame)
+                .GetMethod("TriggerGameEnd", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.Invoke(endGame, null);
+        }
+
+        // Optional fallback string trigger
+        if (triggerNamedRound && !string.IsNullOrEmpty(roundMethodName))
+        {
+            triggerNamedRound = false;
+            TriggerRoundByName(roundMethodName);
+        }
+    }
+
+    public void TriggerSelectedRound()
+    {
+        if (rounds == null || roundMethodNames.Count == 0) return;
+
+        string methodName = roundMethodNames[selectedRoundIndex];
+        TriggerRoundByName(methodName);
+    }
+
+    public void TriggerRoundByName(string methodName)
+    {
+        MethodInfo method = typeof(Rounds).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+        if (method != null)
+        {
+            method.Invoke(rounds, null);
+            Debug.Log($"[DEBUG] Triggered round: {methodName}");
+        }
+        else
+        {
+            Debug.LogWarning($"[DEBUG] Method '{methodName}' not found.");
         }
     }
 

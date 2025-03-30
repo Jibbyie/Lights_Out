@@ -6986,10 +6986,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3390e39628ed26f4fbc2fe3918abc3fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forceLightsOn: 0
-  forceLightsOff: 0
-  triggerRandomEvent: 0
-  setLightsTurnedOffCounter: -1
+  rounds: {fileID: 302726718}
+  selectedRoundIndex: 0
+  roundMethodOptions: []
+  roundMethodName: 
+  triggerNamedRound: 0
 --- !u!4 &1201119763
 Transform:
   m_ObjectHideFlags: 0
