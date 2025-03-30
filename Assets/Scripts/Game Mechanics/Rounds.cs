@@ -171,6 +171,8 @@ public class Rounds : MonoBehaviour
         if (roomEmptied && !entityActionAddedToList)
         {
             actions.Add(EmptyRoomEntity);
+            actions.Add(EmptyRoomEntity);
+            actions.Add(EmptyRoomEntity);
             entityActionAddedToList = true;
         }
 
@@ -229,6 +231,8 @@ public class Rounds : MonoBehaviour
         actions.Add(Footsteps);
 
         // Uncommon Events
+        actions.Add(MirrorSpawn);
+        actions.Add(PutTableOnCeiling);
         actions.Add(MirrorSpawn);
         actions.Add(PutTableOnCeiling);
 
