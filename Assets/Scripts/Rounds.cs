@@ -8,9 +8,15 @@ public class Rounds : MonoBehaviour
 {
     private LightSwitchManager switchManager;
     private PauseMenu pauseMenu;
+
+    [Header("Booleans")]
     private bool onLightsTurnedOn;
     private bool mirror1Active = false;
     private bool mirror2Active = false;
+    private bool roomEmptied = false;
+    private bool lightsAreCurrentlyOff = false;
+    private bool mirror1HasEverSpawned = false;
+
 
     private List<Action> actions = new List<Action>();
 
@@ -33,14 +39,15 @@ public class Rounds : MonoBehaviour
 
     void Start()
     {
-        Debug.Log(table.transform.position);
-        Debug.Log(table.transform.rotation);
 
-        // Mirrors preloading
+        // preloading
         mirror1.SetActive(true);
         mirror1.SetActive(false);
         mirror2.SetActive(true);
         mirror2.SetActive(false);
+        mirror1Active = false;
+        mirror2Active = false;
+        roomEmptied = false;
 
         switchManager = FindObjectOfType<LightSwitchManager>();
         pauseMenu = FindObjectOfType<PauseMenu>();
@@ -75,37 +82,58 @@ public class Rounds : MonoBehaviour
 
     private void HandleLightsOn()
     {
-        if(mirror1Active && lightsTurnedOffCounter < 1)
+        lightsAreCurrentlyOff = false;
+
+        if (mirror1Active && mirrorWhispersSFX != null)
         {
             mirrorWhispersSFX.Stop();
         }
-        if(mirror2Active)
+
+        if (mirror2Active && mirrorWhispers2SFX != null)
         {
             mirrorWhispers2SFX.Stop();
         }
     }
 
+
     private void HandleLightsOff()
     {
-        lightsTurnedOffCounter = switchManager.GetLightsTurnedOffCount(); // Update before checking
-
+        lightsAreCurrentlyOff = true;
+        lightsTurnedOffCounter = switchManager.GetLightsTurnedOffCount();
         ChooseRandomEvent();
-        if (mirror1Active)
+
+        // If the mirror has NEVER spawned and we're past turn 2, spawn mirror 1 FIRST
+        if (!mirror1HasEverSpawned && lightsTurnedOffCounter > 2)
         {
-            mirrorWhispersSFX.Play();
+            MirrorSpawn(); // This will mark mirror1HasEverSpawned = true
+            return;
         }
-        if (lightsTurnedOffCounter > 2 && mirror1Active)
+
+        // Transition from mirror 1 to mirror 2 if enough counters has passed
+        if (mirror1Active && lightsTurnedOffCounter > 4)
         {
             mirror1.SetActive(false);
             mirror1Active = false;
-            mirrorWhispersSFX.Stop();
+
+            if (mirrorWhispersSFX != null) mirrorWhispersSFX.Stop();
 
             mirror2.SetActive(true);
             mirror2Active = true;
+
+            if (mirrorWhispers2SFX != null) mirrorWhispers2SFX.Play();
+
+            return;
         }
-        if (mirror2Active)
+
+        // If mirror1 is active and we're staying on it
+        if (mirror1Active && mirrorWhispersSFX != null)
         {
-            StartCoroutine(Delay(0.1f));
+            mirrorWhispersSFX.Play();
+        }
+
+        // If already on mirror2 and lights go off again
+        if (mirror2Active && mirrorWhispers2SFX != null)
+        {
             mirrorWhispers2SFX.Play();
         }
     }
@@ -155,10 +183,11 @@ public class Rounds : MonoBehaviour
 
         // Uncommon Events
         actions.Add(BehindYou);
-        actions.Add(ShiftTheRoom);
+        //actions.Add(ShiftTheRoom);
 
 
         // Rare Event (Only add once)
+        actions.Add(EmptyRoom);
         actions.Add(MirrorSpawn); 
     }
 
@@ -185,6 +214,21 @@ public class Rounds : MonoBehaviour
         }
     }
 
+    private void EmptyRoom()
+    {
+        roomProps.SetActive(false);
+        roomEmptied = true;
+        Debug.Log("Room has been emptied");
+    }
+
+    private void SpawnEyes()
+    {
+        if(roomEmptied)
+        {
+
+        }
+    }
+
     private void ShiftTheRoom()
     {
         roomProps.transform.rotation = Quaternion.Euler(0, -13.5f, 0);
@@ -208,9 +252,14 @@ public class Rounds : MonoBehaviour
     {
         mirror1.SetActive(true);
         mirror1Active = true;
-        mirrorWhispersSFX.Play();
-        Debug.Log("Mirror spawned");
+        mirror1HasEverSpawned = true;
+
+        mirror2.SetActive(false);
+        mirror2Active = false;
+
+        Debug.Log("Mirror 1 spawned");
     }
+
 
     private IEnumerator SFXDelay(float delay, AudioSource sfx)
     {

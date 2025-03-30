@@ -7,11 +7,17 @@ public class DebugControllerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        DrawDefaultInspector();
+        if (target == null) return;
 
-        DebugController debug = (DebugController)target;
+        DebugController debug = target as DebugController;
+        if (debug == null || debug.Equals(null)) return; // Handles destroyed refs
 
-        if (debug.roundMethodOptions != null && debug.roundMethodOptions.Length > 0)
+        base.OnInspectorGUI();
+
+        if (debug.roundMethodOptions != null &&
+            debug.roundMethodOptions.Length > 0 &&
+            debug.selectedRoundIndex >= 0 &&
+            debug.selectedRoundIndex < debug.roundMethodOptions.Length)
         {
             debug.selectedRoundIndex = EditorGUILayout.Popup("Select Round", debug.selectedRoundIndex, debug.roundMethodOptions);
 
@@ -22,7 +28,7 @@ public class DebugControllerEditor : Editor
         }
         else
         {
-            EditorGUILayout.HelpBox("No round methods found. Is Rounds.cs assigned?", MessageType.Info);
+            EditorGUILayout.HelpBox("No round methods found. Is the Rounds reference assigned and initialized?", MessageType.Info);
         }
     }
 }
