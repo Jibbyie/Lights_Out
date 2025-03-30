@@ -145,31 +145,21 @@ public class Rounds : MonoBehaviour
 
     void PopulateActionList()
     {
-        actions.Add(PutTableOnCeiling);
-        //actions.Add(ShiftTheRoom);
-        //actions.Add(Footsteps);
-        //actions.Add(BehindYou);
-        //actions.Add(DoorKnocking);
         // Do Nothing Event (Most Common)
-        /*
-        actions.Add(DoNothing);
-        actions.Add(DoNothing);
-        actions.Add(DoNothing);
-        actions.Add(DoNothing);
         actions.Add(DoNothing);
 
         // Common Events (Add multiple times)
         actions.Add(DoorKnocking);
-        actions.Add(DoorKnocking);
-        actions.Add(DoorKnocking); 
+        actions.Add(PutTableOnCeiling);
+        actions.Add(Footsteps);
 
         // Uncommon Events
         actions.Add(BehindYou);
-        actions.Add(BehindYou);
-        */
+        actions.Add(ShiftTheRoom);
+
 
         // Rare Event (Only add once)
-        //actions.Add(MirrorSpawn); 
+        actions.Add(MirrorSpawn); 
     }
 
     private void DoNothing()

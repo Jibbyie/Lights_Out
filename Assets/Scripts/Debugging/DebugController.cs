@@ -18,6 +18,7 @@ public class DebugController : MonoBehaviour
     [Header("Manual Round Trigger (Fallback)")]
     public string roundMethodName = "";
     public bool triggerNamedRound = false;
+    private bool methodsInitialized = false;
 
     void Start()
     {
@@ -26,22 +27,31 @@ public class DebugController : MonoBehaviour
         switchManager = FindObjectOfType<LightSwitchManager>();
         if (rounds == null) rounds = FindObjectOfType<Rounds>();
 
-        // Collect private void methods from Rounds
-        if (rounds != null)
-        {
-            var methods = typeof(Rounds)
-                .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-                .Where(m => m.ReturnType == typeof(void) && m.GetParameters().Length == 0)
-                .Select(m => m.Name)
-                .ToList();
-
-            roundMethodNames = methods;
-            roundMethodOptions = methods.ToArray();
-        }
     }
 
     void Update()
     {
+        // Lazy-load method list once rounds has initialized
+        if (!methodsInitialized && rounds != null)
+        {
+            var actionsField = typeof(Rounds).GetField("actions", BindingFlags.NonPublic | BindingFlags.Instance);
+            var actionList = actionsField?.GetValue(rounds) as List<System.Action>;
+
+            if (actionList != null && actionList.Count > 0)
+            {
+                roundMethodNames = actionList
+                    .Where(a => a != null && a.Method != null)
+                    .Select(a => a.Method.Name)
+                    .Distinct()
+                    .ToList();
+
+                roundMethodOptions = roundMethodNames.ToArray();
+                methodsInitialized = true;
+
+                Debug.Log("[DEBUG] Round methods loaded from actions list.");
+            }
+        }
+
         // F1: Force lights ON
         if (Input.GetKeyDown(KeyCode.F1)) SimulateLightsOn();
 
