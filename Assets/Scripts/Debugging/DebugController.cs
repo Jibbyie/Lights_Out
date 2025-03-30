@@ -32,54 +32,23 @@ public class DebugController : MonoBehaviour
     {
         RefreshReferences();
 
-        if (rounds != null && !methodsInitialized)
-            InitializeRoundMethodList();
+        // Dynamically refresh method list when not yet initialized
+        if (!methodsInitialized && rounds != null)
+        {
+            RefreshRoundMethodList();
+        }
 
         if (rounds == null || switchManager == null) return;
 
-        // F1: Force lights ON
+        // Debug input bindings
         if (Input.GetKeyDown(KeyCode.F1)) SimulateLightsOn();
-
-        // F2: Force lights OFF
         if (Input.GetKeyDown(KeyCode.F2)) SimulateLightsOff();
-
-        // F3: Trigger random horror event
         if (Input.GetKeyDown(KeyCode.F3)) rounds.ChooseRandomEvent();
-
-        // F4: Increment lightsTurnedOffCounter manually
-        if (Input.GetKeyDown(KeyCode.F4))
-        {
-            int currentCount = switchManager.GetLightsTurnedOffCount();
-            int newCount = currentCount + 1;
-
-            typeof(LightSwitchManager)
-                .GetField("globalLightsTurnedOffCounter", BindingFlags.Public | BindingFlags.Instance)
-                ?.SetValue(switchManager, newCount);
-
-            Debug.Log($"DEBUG (F4): lightsTurnedOffCounter set to {newCount}");
-        }
-
-        // F5: Log current state
-        if (Input.GetKeyDown(KeyCode.F5))
-        {
-            Debug.Log($"DEBUG (F5): lightsOff = {switchManager.lightsAreOff}, lightsTurnedOffCounter = {switchManager.GetLightsTurnedOffCount()}");
-        }
-
-        // F6: Trigger jumpscare
+        if (Input.GetKeyDown(KeyCode.F4)) IncrementLightsOffCounter();
+        if (Input.GetKeyDown(KeyCode.F5)) LogLightStatus();
         if (Input.GetKeyDown(KeyCode.F6)) jumpScares?.TriggerJumpScare();
+        if (Input.GetKeyDown(KeyCode.F8)) TriggerEndGame();
 
-        // F7: Trigger early jumpscare
-        if (Input.GetKeyDown(KeyCode.F7)) jumpScares?.TriggerEarlyJumpScare();
-
-        // F8: Trigger endgame manually
-        if (Input.GetKeyDown(KeyCode.F8) && endGame != null)
-        {
-            typeof(EndGame)
-                .GetMethod("TriggerGameEnd", BindingFlags.NonPublic | BindingFlags.Instance)
-                ?.Invoke(endGame, null);
-        }
-
-        // Optional fallback
         if (triggerNamedRound && !string.IsNullOrEmpty(roundMethodName))
         {
             triggerNamedRound = false;
@@ -93,15 +62,9 @@ public class DebugController : MonoBehaviour
         if (switchManager == null) switchManager = FindObjectOfType<LightSwitchManager>();
         if (jumpScares == null) jumpScares = FindObjectOfType<JumpScares>();
         if (endGame == null) endGame = FindObjectOfType<EndGame>();
-
-        // In case of replay, reset method list
-        if (rounds != null && roundMethodOptions == null)
-        {
-            methodsInitialized = false;
-        }
     }
 
-    private void InitializeRoundMethodList()
+    private void RefreshRoundMethodList()
     {
         var actionsField = typeof(Rounds).GetField("actions", BindingFlags.NonPublic | BindingFlags.Instance);
         var actionList = actionsField?.GetValue(rounds) as List<System.Action>;
@@ -117,8 +80,13 @@ public class DebugController : MonoBehaviour
             roundMethodOptions = roundMethodNames.ToArray();
             methodsInitialized = true;
 
-            Debug.Log("[DEBUG] Round methods loaded from actions list.");
+            Debug.Log("[DEBUG] Round method list refreshed.");
         }
+    }
+
+    public void ForceRefreshMethodList()
+    {
+        methodsInitialized = false;
     }
 
     public void TriggerSelectedRound()
@@ -136,8 +104,15 @@ public class DebugController : MonoBehaviour
         MethodInfo method = typeof(Rounds).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
         if (method != null)
         {
-            method.Invoke(rounds, null);
-            Debug.Log($"[DEBUG] Triggered round: {methodName}");
+            try
+            {
+                method.Invoke(rounds, null);
+                Debug.Log($"[DEBUG] Triggered round: {methodName}");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[DEBUG] Failed to invoke '{methodName}': {ex.Message}");
+            }
         }
         else
         {
@@ -168,8 +143,8 @@ public class DebugController : MonoBehaviour
             currentSwitch.lightIsOn = false;
             RenderSettings.fog = true;
             currentSwitch.lightOn.SetActive(false);
-            currentSwitch.switchTurnOff.Play();
-            currentSwitch.ambience.Stop();
+            currentSwitch.switchTurnOff?.Play();
+            currentSwitch.ambience?.Stop();
 
             switchManager.OnLightsTurnedOff();
         }
@@ -189,6 +164,33 @@ public class DebugController : MonoBehaviour
                 return sw;
         }
         return null;
+    }
+
+    private void IncrementLightsOffCounter()
+    {
+        int currentCount = switchManager.GetLightsTurnedOffCount();
+        int newCount = currentCount + 1;
+
+        typeof(LightSwitchManager)
+            .GetField("globalLightsTurnedOffCounter", BindingFlags.Public | BindingFlags.Instance)
+            ?.SetValue(switchManager, newCount);
+
+        Debug.Log($"DEBUG (F4): lightsTurnedOffCounter set to {newCount}");
+    }
+
+    private void LogLightStatus()
+    {
+        Debug.Log($"DEBUG (F5): lightsOff = {switchManager.lightsAreOff}, lightsTurnedOffCounter = {switchManager.GetLightsTurnedOffCount()}");
+    }
+
+    private void TriggerEndGame()
+    {
+        if (endGame != null)
+        {
+            typeof(EndGame)
+                .GetMethod("TriggerGameEnd", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.Invoke(endGame, null);
+        }
     }
 }
 #endif

@@ -2,11 +2,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using Unity.VisualScripting;
+using UnityEngine.LowLevel;
 
 public class JumpScares : MonoBehaviour
 {
     public AudioSource jumpScareSFX;
     public AudioSource lightSwitchOff;
+    public AudioSource neckSnapSFX;
+    public AudioSource entityGrabbedYouSFX;
+    public GameObject blackScreen;
     private LightSwitchManager lightSwitchManager;
     private LightSwitch lightSwitch;
     private CampingSwitch campingSwitch;
@@ -27,44 +31,45 @@ public class JumpScares : MonoBehaviour
                 lightSwitchManager.GetLightsTurnedOffTime() >= lightSwitchManager.GetLightsOffTooLongTime())
             {
                 isSceneLoading = true; // Prevent multiple triggers
-                lightSwitchOff.PlayOneShot(lightSwitchOff.clip);
-                StartCoroutine(LoadSceneAfterSFX("TooLongInTheDark", lightSwitchOff.clip.length));
+                neckSnapSFX.PlayOneShot(neckSnapSFX.clip);
+                StartCoroutine(LoadBlackScreenThenEndScreen("TooLongInTheDark", neckSnapSFX.clip.length));
             }
 
             if (campingSwitch.TimeNearSwitch() >= campingSwitch.MaxCampingTime())
             {
                 isSceneLoading = true;
                 lightSwitchOff.PlayOneShot(lightSwitchOff.clip);
-                StartCoroutine(LoadSceneAfterSFX("DontCampTheSwitches", lightSwitchOff.clip.length));
+                StartCoroutine(LoadBlackScreenThenEndScreen("DontCampTheSwitches", lightSwitchOff.clip.length));
             }
         }
     }
 
     public void TriggerJumpScare()
     {
-        if (jumpScareSFX != null)
+       
+        if(entityGrabbedYouSFX != null)
         {
-            jumpScareSFX.Play();
+            entityGrabbedYouSFX.PlayOneShot(entityGrabbedYouSFX.clip);
+            StartCoroutine(LoadBlackScreenThenEndScreen("TheEntityGotYou", entityGrabbedYouSFX.clip.length));
         }
-
-        Debug.Log("Boo! Jumpscare triggered!");
-
     }
 
-    public void TriggerEarlyJumpScare()
+    private IEnumerator LoadBlackScreenThenEndScreen(string sceneName, float blackScreenDelay)
     {
-        Debug.Log("Early jumpscare triggered! The lights were off too long! : " + lightSwitchManager.lightsTurnedOffTime);
 
-        if (jumpScareSFX != null)
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
         {
-            jumpScareSFX.Play();
+            var movement = player.GetComponent<PlayerMovement>();
+            var look = player.GetComponent<MouseLook>();
+            if (movement) movement.enabled = false;
+            if (look) look.enabled = false;
         }
 
-    }
+        blackScreen.SetActive(true);
 
-    private IEnumerator LoadSceneAfterSFX(string sceneName, float delay)
-    {
-        yield return new WaitForSeconds(delay); 
+        yield return new WaitForSeconds(blackScreenDelay + 1F);
         SceneManager.LoadScene(sceneName);
     }
+
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using System;
 using System.Reflection;
+using JetBrains.Annotations;
 
 public class Rounds : MonoBehaviour
 {
@@ -16,7 +17,8 @@ public class Rounds : MonoBehaviour
     private bool roomEmptied = false;
     private bool lightsAreCurrentlyOff = false;
     private bool mirror1HasEverSpawned = false;
-
+    private bool entityEmptyRoomSpawned = false;
+    private bool entityActionAddedToList = false;
 
     private List<Action> actions = new List<Action>();
 
@@ -33,19 +35,26 @@ public class Rounds : MonoBehaviour
     public GameObject mirror2;
     public GameObject roomProps;
     public GameObject table;
+    public GameObject entityEmptyRoom;
 
     private int lastEventIndex = -1;
     private int lightsTurnedOffCounter;
-
-    void OnEnable()
+    private void OnDestroy()
     {
-        actions = new List<Action>();
-        PopulateActionList();
+        LightSwitchManager.LightsTurnedOn -= HandleLightsOn;
+        LightSwitchManager.LightsTurnedOff -= HandleLightsOff;
+    }
+
+    private void OnDisable()
+    {
+        LightSwitchManager.LightsTurnedOn -= HandleLightsOn;
+        LightSwitchManager.LightsTurnedOff -= HandleLightsOff;
     }
 
     void Start()
     {
         actions.Clear();
+        PopulateActionList();
         // preloading
         mirror1.SetActive(true);
         mirror1.SetActive(false);
@@ -54,11 +63,10 @@ public class Rounds : MonoBehaviour
         mirror1Active = false;
         mirror2Active = false;
         roomEmptied = false;
+        entityActionAddedToList = false;
 
         switchManager = FindObjectOfType<LightSwitchManager>();
         pauseMenu = FindObjectOfType<PauseMenu>();
-
-        PopulateActionList();
 
         if (switchManager != null)
         {
@@ -72,6 +80,8 @@ public class Rounds : MonoBehaviour
 
         LightSwitchManager.LightsTurnedOn += HandleLightsOn; // Subscribe to events in LightSwitchManager
         LightSwitchManager.LightsTurnedOff += HandleLightsOff;
+
+
     }
 
     private void Update()
@@ -104,6 +114,15 @@ public class Rounds : MonoBehaviour
         if (mirror2Active && mirrorWhispers2SFX != null)
         {
             mirrorWhispers2SFX.Stop();
+        }
+
+
+        if (roomEmptied)
+        {
+            if (roomEmptied && entityEmptyRoomSpawned && entityEmptyRoom != null && !entityEmptyRoom.Equals(null))
+            {
+                entityEmptyRoom.SetActive(false);
+            }
         }
     }
 
@@ -148,6 +167,18 @@ public class Rounds : MonoBehaviour
         {
             mirrorWhispers2SFX.Play();
         }
+
+        if (roomEmptied && !entityActionAddedToList)
+        {
+            actions.Add(EmptyRoomEntity);
+            entityActionAddedToList = true;
+        }
+
+        if (roomEmptied && entityEmptyRoomSpawned && entityEmptyRoom != null && !entityEmptyRoom.Equals(null))
+        {
+            entityEmptyRoom.SetActive(true);
+        }
+
     }
 
 
@@ -187,20 +218,22 @@ public class Rounds : MonoBehaviour
     {
         // Do Nothing Event (Most Common)
         actions.Add(DoNothing);
+        actions.Add(DoNothing);
 
         // Common Events (Add multiple times)
         actions.Add(DoorKnocking);
-        actions.Add(PutTableOnCeiling);
+        actions.Add(DoorKnocking);
+        actions.Add(BehindYou);
+        actions.Add(BehindYou);
+        actions.Add(Footsteps);
         actions.Add(Footsteps);
 
         // Uncommon Events
-        actions.Add(BehindYou);
-        //actions.Add(ShiftTheRoom);
-
+        actions.Add(MirrorSpawn);
+        actions.Add(PutTableOnCeiling);
 
         // Rare Event (Only add once)
         actions.Add(EmptyRoom);
-        actions.Add(MirrorSpawn); 
     }
 
     private void DoNothing()
@@ -234,17 +267,11 @@ public class Rounds : MonoBehaviour
         Debug.Log("Room has been emptied");
     }
 
-    private void SpawnEyes()
+    private void EmptyRoomEntity()
     {
-        if(roomEmptied)
-        {
-
-        }
-    }
-
-    private void ShiftTheRoom()
-    {
-        roomProps.transform.rotation = Quaternion.Euler(0, -13.5f, 0);
+        if (entityEmptyRoom == null) return;
+        entityEmptyRoomSpawned = true;
+        Debug.Log("Entity spawned");
     }
 
     private void PutTableOnCeiling()
@@ -284,11 +311,6 @@ public class Rounds : MonoBehaviour
         {
             sfx.Play();
         }
-    }
-
-    private IEnumerator Delay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
     }
 
     void StopAllAudio()
@@ -331,11 +353,3 @@ public class Rounds : MonoBehaviour
     }
 
 }
-
-//Debug.Log("Current Actions in List:: ");
-
-//foreach (var action in actions)
-//{
-//    Debug.Log(action.Method.Name); // Print functions name
-//}
-

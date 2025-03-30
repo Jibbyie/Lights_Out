@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TooLongInTheDark.unity
     guid: d8b4c6f164b4b1344bed8418269264ae
+  - enabled: 1
+    path: Assets/Scenes/TheEntityGotYou.unity
+    guid: ee00a4af270b16340be8a8803cb181ff
   m_configObjects: {}
