@@ -45,7 +45,7 @@ public class Rounds : MonoBehaviour
 
     void Start()
     {
-
+        actions.Clear();
         // preloading
         mirror1.SetActive(true);
         mirror1.SetActive(false);
@@ -76,7 +76,13 @@ public class Rounds : MonoBehaviour
 
     private void Update()
     {
-        if(pauseMenu.isGamePaused)
+        if (pauseMenu == null)
+        {
+            pauseMenu = FindObjectOfType<PauseMenu>();
+            if (pauseMenu == null) return;
+        }
+
+        if (pauseMenu.isGamePaused)
         {
             StopAllAudio();
         }
@@ -222,6 +228,7 @@ public class Rounds : MonoBehaviour
 
     private void EmptyRoom()
     {
+        if (roomProps == null) return;
         roomProps.SetActive(false);
         roomEmptied = true;
         Debug.Log("Room has been emptied");
@@ -242,6 +249,8 @@ public class Rounds : MonoBehaviour
 
     private void PutTableOnCeiling()
     {
+        if (table == null) return;
+
         table.transform.position = new Vector3(-1.54f, 2.80f, 4.05f);
         table.transform.rotation = new Quaternion(0.35849f, 0f, 0.93353f, 0f);
     }
@@ -256,6 +265,7 @@ public class Rounds : MonoBehaviour
 }
     private void MirrorSpawn()
     {
+        if (mirror1 == null) return;
         mirror1.SetActive(true);
         mirror1Active = true;
         mirror1HasEverSpawned = true;
@@ -270,7 +280,10 @@ public class Rounds : MonoBehaviour
     private IEnumerator SFXDelay(float delay, AudioSource sfx)
     {
         yield return new WaitForSeconds(delay);
-        sfx.Play();
+        if (sfx != null)
+        {
+            sfx.Play();
+        }
     }
 
     private IEnumerator Delay(float delay)
