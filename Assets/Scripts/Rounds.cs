@@ -37,6 +37,12 @@ public class Rounds : MonoBehaviour
     private int lastEventIndex = -1;
     private int lightsTurnedOffCounter;
 
+    void OnEnable()
+    {
+        actions = new List<Action>();
+        PopulateActionList();
+    }
+
     void Start()
     {
 
